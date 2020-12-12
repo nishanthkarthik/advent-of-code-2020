@@ -1,0 +1,4 @@
+BasedOnStyle: WebKit
+ColumnLimit: 120
+PointerAlignment: Right
+AllowShortIfStatementsOnASingleLine: WithoutElse
