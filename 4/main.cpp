@@ -1,16 +1,13 @@
 #include <algorithm>
 #include <array>
-#include <cctype>
 #include <fstream>
 #include <iostream>
+#include <map>
 #include <numeric>
 #include <stdexcept>
-#include <tuple>
-#include <unordered_map>
 #include <vector>
 
 #include "boost/fusion/adapted.hpp"
-#include "boost/fusion/tuple.hpp"
 #include "boost/spirit/home/x3.hpp"
 #include "boost/variant.hpp"
 
@@ -145,9 +142,7 @@ const auto passportPreliminaryCheck = [](const auto &passport) -> bool {
 template <typename T> int f1(const T &passports)
 {
     int count = 0;
-    for (const auto &passport : passports) {
-        count += passportPreliminaryCheck(passport);
-    }
+    for (const auto &passport : passports) { count += passportPreliminaryCheck(passport); }
     return count;
 }
 
