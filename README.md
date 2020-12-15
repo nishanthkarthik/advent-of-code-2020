@@ -19,3 +19,6 @@
 - [Day 10](10/main.cpp)
 - [Day 11](11/main.cpp)
 - [Day 12](12/main.cpp)
+- [Day 13](13/main.cpp)
+- [Day 14](14/main.cpp)
+- [Day 15](15/main.cpp)
