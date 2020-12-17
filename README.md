@@ -22,3 +22,5 @@
 - [Day 13](13/main.cpp)
 - [Day 14](14/main.cpp)
 - [Day 15](15/main.cpp)
+- [Day 16](16/main.cpp)
+- [Day 17](17/main.cpp)
