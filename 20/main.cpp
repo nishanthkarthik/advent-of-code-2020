@@ -44,13 +44,6 @@ PreResult preprocess1(const PreTile &preTile)
         }
         tiles[idx] = tile;
     }
-    // for (const auto &[idx, tile] : tiles) {
-    //     std::cout << idx << '\t';
-    //     std::cout << tile.l.to_ulong() << ' ';
-    //     std::cout << tile.t.to_ulong() << ' ';
-    //     std::cout << tile.r.to_ulong() << ' ';
-    //     std::cout << tile.b.to_ulong() << std::endl;
-    // }
     return tiles;
 }
 
@@ -138,12 +131,6 @@ Graph f2_graph(const std::unordered_map<int, Tile1> &input)
             }
         }
     }
-
-    //    for (const auto &[node, to_nodes] : graph) {
-    //        std::cout << node << '\t';
-    //        for (auto e : to_nodes) std::cout << e << ' ';
-    //        std::cout << std::endl;
-    //    }
     return graph;
 }
 
@@ -181,15 +168,6 @@ Grid f2_reconstruct(const Graph &graph)
         std::cout << std::endl;
     };
 
-    const auto isGridNotFull = [&] {
-        for (const auto &row : grid) {
-            for (const auto &item : row) {
-                if (item == NONE) return true;
-            }
-        }
-        return false;
-    };
-
     const auto totalNeighbors = [N](int i, int j) {
         std::set<Dir> set;
         if (i != 0) set.insert(Dir::top);
@@ -218,7 +196,8 @@ Grid f2_reconstruct(const Graph &graph)
         throw std::runtime_error { "ENUM Dir" };
     };
 
-    while (isGridNotFull()) {
+    int counter = 3;
+    while (counter < N * N) {
         // Fill neighbors
         for (int i = 0; i < N; ++i) {
             for (int j = 0; j < N; ++j) {
@@ -249,12 +228,14 @@ Grid f2_reconstruct(const Graph &graph)
 
                 const auto [xOff, yOff] = dirOffset(*toFillPos.begin());
                 grid[i + xOff][j + yOff] = *toFill.begin();
+                ++counter;
             }
         }
 
         // Fill empty spots
         for (int i = 0; i < N; ++i) {
             for (int j = 0; j < N; ++j) {
+                if (grid[i][j] != NONE) continue;
                 // should not be any corners or edges
                 const auto TN = totalNeighbors(i, j);
                 if (TN.size() != 4) continue;
@@ -287,6 +268,7 @@ Grid f2_reconstruct(const Graph &graph)
                         assert(diff.size() == 2);
                         const auto diag = grid[i + mxOff + nxOff][j + myOff + nyOff];
                         grid[i][j] = diff[0] == diag ? diff[1] : diff[0];
+                        ++counter;
                         break;
                     }
                 }
@@ -294,7 +276,7 @@ Grid f2_reconstruct(const Graph &graph)
         }
     }
 
-    std::cout << "Reconstructed image" << std::endl;
+    std::cout << "Reconstructed image after steps " << counter << std::endl;
     printGrid();
     return grid;
 }
@@ -381,13 +363,41 @@ PreData tileFromPicture(const Picture &pic, int ii, int jj)
     return data;
 }
 
-Picture f2_draw(const Grid &grid, const PreResult &pre, PreTile input)
+Picture f2_draw(const Grid &grid, const PreResult &pre, PreTile &input)
 {
     const int N = std::sqrt(pre.size());
     Picture pic(DIM * N, std::vector<bool>(DIM * N, false));
 
-    // Bad bad hacky hack!
-    drawAt(pic, flipV(input[grid[0][0]]), 0, 0);
+    auto startPre = input[grid[0][0]];
+    const auto bottomPre = input[grid[1][0]];
+    const auto bottomSet = std::set {
+        edge(bottomPre, Dir::left),
+        edge(flipV(bottomPre), Dir::left),
+        edge(bottomPre, Dir::right),
+        edge(flipV(bottomPre), Dir::right),
+        edge(bottomPre, Dir::top),
+        edge(flipH(bottomPre), Dir::top),
+        edge(bottomPre, Dir::bottom),
+        edge(flipH(bottomPre), Dir::bottom),
+    };
+    const auto rightPre = input[grid[0][1]];
+    const auto rightSet = std::set {
+        edge(rightPre, Dir::left),
+        edge(flipV(rightPre), Dir::left),
+        edge(rightPre, Dir::right),
+        edge(flipV(rightPre), Dir::right),
+        edge(rightPre, Dir::top),
+        edge(flipH(rightPre), Dir::top),
+        edge(rightPre, Dir::bottom),
+        edge(flipH(rightPre), Dir::bottom),
+    };
+    while (true) {
+        if (bottomSet.find(edge(startPre, Dir::bottom)) != bottomSet.end()) break;
+        startPre = rotateAntiClk(startPre);
+    }
+    if (rightSet.find(edge(startPre, Dir::bottom)) == rightSet.end()) startPre = flipH(startPre);
+
+    drawAt(pic, startPre, 0, 0);
 
     std::cout << "H sweep" << std::endl;
     // horizontal sweep
@@ -459,7 +469,7 @@ Picture f2_remove_border(const Picture &in)
 
 int main()
 {
-    const auto input = parseFile();
+    auto input = parseFile();
     const auto pre1 = preprocess1(input);
     f1(pre1);
     const auto grid = f2_reconstruct(f2_graph(pre1));
@@ -467,9 +477,7 @@ int main()
     const auto image = f2_remove_border(drawing);
     std::ofstream out("image.txt", std::ios::trunc);
     for (const auto &row : image) {
-        for (const auto &col : row) {
-            out << (col ? 1 : 0) << ",";
-        }
+        for (const auto &col : row) { out << (col ? 1 : 0) << ","; }
         out << std::endl;
     }
 }
