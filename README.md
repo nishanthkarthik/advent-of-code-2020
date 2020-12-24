@@ -3,7 +3,8 @@
 ## Stack
 
 - C++17
-- [Boost Spirit X3](https://www.boost.org/doc/libs/1_75_0/libs/spirit/doc/x3/html/index.html)
+- [Boost Spirit X3](https://www.boost.org/doc/libs/release/libs/spirit/doc/x3/html/index.html)
+- [Boost MultiArray](https://www.boost.org/doc/libs/release/libs/multi_array/doc/user.html)
 
 ## Solutions
 
@@ -28,3 +29,10 @@
 - [Day 19](19/main.cpp)
 - [Day 20](20/main.cpp)
 - [Day 21](21/main.cpp)
+- [Day 22](22/main.cpp)
+- [Day 23](23/main.cpp)
+- [Day 24](24/main.cpp)
+
+## Ranking so far
+
+![ranking](plot.png)
