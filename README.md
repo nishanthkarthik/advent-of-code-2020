@@ -32,6 +32,7 @@
 - [Day 22](22/main.cpp)
 - [Day 23](23/main.cpp)
 - [Day 24](24/main.cpp)
+- [Day 25](25/main.cpp)
 
 ## Ranking so far
 
